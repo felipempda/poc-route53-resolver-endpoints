@@ -3,19 +3,21 @@
 
 // VPC and Subnets
 module "vpc-a" {
-  source         = "./vpc"
-  vpc_cidr_block = local.vpca_cidr
-  subneta_az     = local.aza
-  subnetb_az     = local.azb
-  subneta_cidr   = local.vpca_subneta_cidr
-  subnetb_cidr   = local.vpca_subnetb_cidr
+  source               = "./vpc"
+  vpc_cidr_block       = local.vpca_cidr
+  subneta_az           = local.aza
+  subnetb_az           = local.azb
+  public_subneta_cidr  = local.vpca_public_subneta_cidr
+  public_subnetb_cidr  = local.vpca_public_subnetb_cidr
+  private_subneta_cidr = local.vpca_private_subneta_cidr
+  private_subnetb_cidr = local.vpca_private_subnetb_cidr
 }
 
 // EC2 instance
 module "ec2-a" {
   source          = "./ec2"
   vpc_id          = module.vpc-a.vpc_id
-  subnet_id       = module.vpc-a.subneta_id
+  subnet_id       = module.vpc-a.public_subneta_id
   public_key_path = "~/.ssh/id_rsa.pub"
   name            = "instance-a"
 }
@@ -56,11 +58,11 @@ resource "aws_route53_resolver_endpoint" "inbound" {
   security_group_ids = [aws_security_group.inbound.id]
 
   ip_address {
-    subnet_id = module.vpc-a.subneta_id
+    subnet_id = module.vpc-a.private_subneta_id
     ip        = local.vpca_inbound_resolver_ipa
   }
   ip_address {
-    subnet_id = module.vpc-a.subnetb_id
+    subnet_id = module.vpc-a.private_subnetb_id
     ip        = local.vpca_inbound_resolver_ipb
   }
 }

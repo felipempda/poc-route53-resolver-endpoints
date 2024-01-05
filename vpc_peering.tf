@@ -14,14 +14,26 @@ resource "aws_vpc_peering_connection" "peer" {
 
 
 // Routes for communication between VPCs
-resource "aws_route" "traffic-from-a-to-b" {
-  route_table_id            = module.vpc-a.route_table_id
+resource "aws_route" "traffic-from-a-to-b-public" {
+  route_table_id            = module.vpc-a.public_route_table_id
   destination_cidr_block    = local.vpcb_cidr
   vpc_peering_connection_id = aws_vpc_peering_connection.peer.id
 }
 
-resource "aws_route" "traffic-from-b-to-a" {
-  route_table_id            = module.vpc-b.route_table_id
+resource "aws_route" "traffic-from-a-to-b-private" {
+  route_table_id            = module.vpc-a.private_route_table_id
+  destination_cidr_block    = local.vpcb_cidr
+  vpc_peering_connection_id = aws_vpc_peering_connection.peer.id
+}
+
+resource "aws_route" "traffic-from-b-to-a-public" {
+  route_table_id            = module.vpc-b.public_route_table_id
+  destination_cidr_block    = local.vpca_cidr
+  vpc_peering_connection_id = aws_vpc_peering_connection.peer.id
+}
+
+resource "aws_route" "traffic-from-b-to-a-private" {
+  route_table_id            = module.vpc-b.private_route_table_id
   destination_cidr_block    = local.vpca_cidr
   vpc_peering_connection_id = aws_vpc_peering_connection.peer.id
 }
