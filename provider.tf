@@ -9,3 +9,12 @@ provider "aws" {
     }
   }
 }
+
+terraform {
+  required_version = ">= 1"
+
+  required_providers {
+    aws  = "5.31.0"
+    http = "3.4.1"
+  }
+}

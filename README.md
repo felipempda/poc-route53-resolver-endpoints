@@ -41,7 +41,7 @@ Result should be similar to the following:
 ====================================================
 Test DNS resolution from Environment A
 ====================================================
-$ ssh -o StrictHostKeyChecking=no ubuntu@ec2-XXXXXXXXXX.ca-central-1.compute.amazonaws.com nslookup google.environment-a.private.com
+$ nslookup google.environment-a.private.com
 Server:         127.0.0.53
 Address:        127.0.0.53#53
 
@@ -52,7 +52,7 @@ Address: 172.217.13.164
 Name:   www.google.com
 Address: 2607:f8b0:4020:807::2004
 
-$ ssh -o StrictHostKeyChecking=no ubuntu@ec2-XXXXXXXXXX.ca-central-1.compute.amazonaws.com nslookup google.environment-a.private.com 10.78.100.10
+$ nslookup google.environment-a.private.com 10.78.100.10
 Server:         10.78.100.10
 Address:        10.78.100.10#53
 
@@ -66,13 +66,13 @@ Address: 2607:f8b0:4020:807::2004
 ====================================================
 Test DNS resolution from Environment B
 ====================================================
-$ ssh -o StrictHostKeyChecking=no ubuntu@ec2-YYYYYYYYY.ca-central-1.compute.amazonaws.com nslookup google.environment-a.private.com
+$ nslookup google.environment-a.private.com
 Server:         127.0.0.53
 Address:        127.0.0.53#53
 
 ** server can't find google.environment-a.private.com: NXDOMAIN
 
-$ ssh -o StrictHostKeyChecking=no ubuntu@ec2-YYYYYYYYY.ca-central-1.compute.amazonaws.com nslookup google.environment-a.private.com 10.78.100.10
+$ nslookup google.environment-a.private.com 10.78.100.10
 Server:         10.78.100.10
 Address:        10.78.100.10#53
 
@@ -94,12 +94,14 @@ This would be the equivalent of a onPremises environment DNS that needs to have 
 
 ## Deploy the outbound resolver on VPC-B
 
+By specifying the parameter `use_output_endpoint` as true (default) we deploy un outbound resolver on VPC-B, with a forward rule to VPC-A:
+
 ```bash
 terraform init
 terraform apply -auto-approve -var=use_output_endpoint=true
 ```
 
-## Test DNS resolution second time
+## Test DNS resolution a second time
 
 Run the test script:
 
@@ -114,7 +116,11 @@ With the outbound rule configured, there's not `extra` step that needs to be don
 Test DNS resolution from Environment A
 ====================================================
 # The same as before  (...)
-$ ssh -o StrictHostKeyChecking=no ubuntu@ec2-YYYYYYYYY.ca-central-1.compute.amazonaws.com nslookup google.environment-a.private.com
+
+====================================================
+Test DNS resolution from Environment B
+====================================================
+$ nslookup google.environment-a.private.com
 Warning: Permanently added 'ec2-YYYYYYYYY.ca-central-1.compute.amazonaws.com' (ED25519) to the list of known hosts.
 Server:         127.0.0.53
 Address:        127.0.0.53#53
@@ -126,7 +132,7 @@ Address: 172.217.13.100
 Name:   www.google.com
 Address: 2607:f8b0:4020:806::2004
 
-$ ssh -o StrictHostKeyChecking=no ubuntu@ec2-YYYYYYYYY.ca-central-1.compute.amazonaws.com nslookup google.environment-a.private.com 10.78.100.10
+$ nslookup google.environment-a.private.com 10.78.100.10
 Server:         10.78.100.10
 Address:        10.78.100.10#53
 

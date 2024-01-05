@@ -9,16 +9,20 @@ privateZone="environment-a.private.com"
 cname="google"
 entry="${cname}.${privateZone}"
 
-exe() { echo "\$ $@" ; "$@" ; }
+sshremote() {
+    server=$1
+    command=$2
+    echo "\$ $command" ; eval "ssh -o StrictHostKeyChecking=no  $server $command" ;
+}
 
 echo "===================================================="
 echo "Test DNS resolution from Environment A"
 echo "===================================================="
-exe ssh -o StrictHostKeyChecking=no  ubuntu@${insta}    nslookup ${entry}
-exe ssh -o StrictHostKeyChecking=no  ubuntu@${insta}    nslookup ${entry} ${inboundipa}
+sshremote "ubuntu@${insta}" "nslookup ${entry}"
+sshremote "ubuntu@${insta}" "nslookup ${entry} ${inboundipa}"
 
 echo "===================================================="
 echo "Test DNS resolution from Environment B"
 echo "===================================================="
-exe ssh -o StrictHostKeyChecking=no  ubuntu@${instb}    nslookup ${entry}
-exe ssh -o StrictHostKeyChecking=no  ubuntu@${instb}    nslookup ${entry} ${inboundipa}
+sshremote "ubuntu@${instb}" "nslookup ${entry}"
+sshremote "ubuntu@${instb}" "nslookup ${entry} ${inboundipa}"
