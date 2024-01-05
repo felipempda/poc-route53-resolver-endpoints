@@ -24,6 +24,7 @@ This POC aims to deploy two VPCs in order to test route53 inbound and outbound c
 ## Deploy terraform
 
 ```bash
+cd src/
 terraform init
 terraform apply -auto-approve -var=use_output_endpoint=false
 ```
@@ -149,4 +150,10 @@ In summary:
 ```bash
 nslookup google.environment-a.private.com              # It works now, because there's an outbound resolver that forwards queries to VPC-A inbound resolver
 nslookup google.environment-a.private.com 10.78.100.10 # It works, because it queries VPC-A inbound resolver IP directly
+```
+
+## Destroy resources
+
+```bash
+terraform destroy -auto-approve
 ```
