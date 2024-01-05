@@ -4,13 +4,13 @@
 // VPC and Subnets
 module "vpc-a" {
   source               = "./vpc"
-  vpc_cidr_block       = local.vpca_cidr
-  subneta_az           = local.aza
-  subnetb_az           = local.azb
-  public_subneta_cidr  = local.vpca_public_subneta_cidr
-  public_subnetb_cidr  = local.vpca_public_subnetb_cidr
-  private_subneta_cidr = local.vpca_private_subneta_cidr
-  private_subnetb_cidr = local.vpca_private_subnetb_cidr
+  vpc_cidr_block       = var.vpca_cidr
+  subneta_az           = var.aza
+  subnetb_az           = var.azb
+  public_subneta_cidr  = var.vpca_public_subneta_cidr
+  public_subnetb_cidr  = var.vpca_public_subnetb_cidr
+  private_subneta_cidr = var.vpca_private_subneta_cidr
+  private_subnetb_cidr = var.vpca_private_subnetb_cidr
 }
 
 // EC2 instance
@@ -26,9 +26,9 @@ module "ec2-a" {
 resource "aws_route53_zone" "dns_zone_private" {
   vpc {
     vpc_id     = module.vpc-a.vpc_id
-    vpc_region = local.region
+    vpc_region = var.region
   }
-  name = local.private_domain
+  name = var.private_domain
 }
 
 resource "aws_route53_record" "google" {
@@ -59,22 +59,25 @@ resource "aws_route53_resolver_endpoint" "inbound" {
 
   ip_address {
     subnet_id = module.vpc-a.private_subneta_id
-    ip        = local.vpca_inbound_resolver_ipa
+    ip        = var.vpca_inbound_resolver_ipa
   }
   ip_address {
     subnet_id = module.vpc-a.private_subnetb_id
-    ip        = local.vpca_inbound_resolver_ipb
+    ip        = var.vpca_inbound_resolver_ipb
   }
 }
 
 output "vpca-instance-public-dns" {
-  value = module.ec2-a.public_dns
+  value       = module.ec2-a.public_dns
+  description = "Public DNS of instance-a"
 }
 
 output "vpca-inbound-resolver-ipA" {
-  value = local.vpca_inbound_resolver_ipa
+  value       = var.vpca_inbound_resolver_ipa
+  description = "IP of inbound-resolver on VPCA-A private subnet A"
 }
 
 output "vpca-inbound-resolver-ipB" {
-  value = local.vpca_inbound_resolver_ipb
+  value       = var.vpca_inbound_resolver_ipb
+  description = "IP of inbound-resolver on VPCA-A private subnet B"
 }

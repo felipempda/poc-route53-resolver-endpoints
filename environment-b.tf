@@ -3,13 +3,13 @@
 // VPC and Subnets
 module "vpc-b" {
   source               = "./vpc"
-  vpc_cidr_block       = local.vpcb_cidr
-  subneta_az           = local.aza
-  subnetb_az           = local.azb
-  public_subneta_cidr  = local.vpcb_public_subneta_cidr
-  public_subnetb_cidr  = local.vpcb_public_subnetb_cidr
-  private_subneta_cidr = local.vpcb_private_subneta_cidr
-  private_subnetb_cidr = local.vpcb_private_subnetb_cidr
+  vpc_cidr_block       = var.vpcb_cidr
+  subneta_az           = var.aza
+  subnetb_az           = var.azb
+  public_subneta_cidr  = var.vpcb_public_subneta_cidr
+  public_subnetb_cidr  = var.vpcb_public_subnetb_cidr
+  private_subneta_cidr = var.vpcb_private_subneta_cidr
+  private_subnetb_cidr = var.vpcb_private_subnetb_cidr
 }
 
 // EC2 instance
@@ -56,22 +56,23 @@ resource "aws_route53_resolver_endpoint" "outbound" {
 }
 
 output "vpcb-instance-public-dns" {
-  value = module.ec2-b.public_dns
+  value       = module.ec2-b.public_dns
+  description = "Public DNS of instance-b"
 }
 
 // Forward rule for Outbound resolver
 resource "aws_route53_resolver_rule" "from-b-to-a" {
   count                = var.use_output_endpoint ? 1 : 0
-  domain_name          = local.private_domain
+  domain_name          = var.private_domain
   name                 = "Rule from B to A"
   rule_type            = "FORWARD"
   resolver_endpoint_id = aws_route53_resolver_endpoint.outbound[0].id
 
   target_ip {
-    ip = local.vpca_inbound_resolver_ipa
+    ip = var.vpca_inbound_resolver_ipa
   }
   target_ip {
-    ip = local.vpca_inbound_resolver_ipb
+    ip = var.vpca_inbound_resolver_ipb
   }
 }
 
